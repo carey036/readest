@@ -2,9 +2,7 @@ import * as React from 'react';
 import { PiBooks } from 'react-icons/pi';
 
 import { useEnv } from '@/context/EnvContext';
-import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAppRouter } from '@/hooks/useAppRouter';
 import LibraryImportButton from './LibraryImportButton';
 
 interface LibraryEmptyStateProps {
@@ -14,8 +12,6 @@ interface LibraryEmptyStateProps {
 const LibraryEmptyState: React.FC<LibraryEmptyStateProps> = ({ onImport }) => {
   const _ = useTranslation();
   const { appService } = useEnv();
-  const { user } = useAuth();
-  const router = useAppRouter();
   const isMobile = appService?.isMobile ?? false;
 
   return (
