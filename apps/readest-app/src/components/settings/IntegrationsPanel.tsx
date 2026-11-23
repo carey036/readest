@@ -14,7 +14,7 @@ import {
   RiSendPlaneLine,
   RiWifiLine,
   RiCloudLine,
-  RiCloudFill,
+  
   RiDatabase2Line,
   RiGoogleLine,
   RiMicrosoftLine,
