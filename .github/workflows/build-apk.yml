@@ -1,0 +1,90 @@
+name: Build Android APK (self-hosted mod)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 150
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/readest-app/src-tauri -> target
+          key: android-aarch64
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;28.2.13676358" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build APK
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/28.2.13676358
+          CI: true
+        run: |
+          set -e
+          cd apps/readest-app
+          rm -rf src-tauri/gen/android
+          pnpm tauri android init
+          pnpm tauri icon ../../data/icons/readest-book.png
+          git checkout .
+          cd src-tauri/gen/android
+          echo "keyAlias=readest" > keystore.properties
+          echo "password=readest123" >> keystore.properties
+          base64 -d < ../../../ci/release.keystore.b64 > "$RUNNER_TEMP/keystore.jks"
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
+          cd ../../..
+          pnpm tauri android build -t aarch64
+          echo "--- built apks ---"
+          find src-tauri/gen/android/app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
+
+      - name: Collect APK
+        run: |
+          set -e
+          mkdir -p out
+          find apps/readest-app/src-tauri/gen/android/app/build/outputs/apk -name "*.apk" -exec cp {} out/ \;
+          ls -lh out/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: readest-mod-apk
+          path: out/*.apk
+          retention-days: 30
