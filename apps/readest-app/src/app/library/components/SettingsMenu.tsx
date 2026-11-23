@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
-import { PiUserCircle, PiUserCircleCheck, PiGear, PiChartBar, PiCardsThree } from 'react-icons/pi';
+import { PiUserCircleCheck, PiGear, PiChartBar, PiCardsThree } from 'react-icons/pi';
 import { PiSun, PiMoon } from 'react-icons/pi';
 import { TbSunMoon } from 'react-icons/tb';
 import { MdCloudSync, MdSync, MdSyncProblem, MdOutlineSensors } from 'react-icons/md';
@@ -109,11 +109,6 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ onPullLibrary, setIsDropdow
 
   const downloadReadest = () => {
     window.open(DOWNLOAD_READEST_URL, '_blank');
-    setIsDropdownOpen?.(false);
-  };
-
-  const handleUserLogin = () => {
-    navigateToLogin(router);
     setIsDropdownOpen?.(false);
   };
 
@@ -353,9 +348,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ onPullLibrary, setIsDropdow
             <MenuItem label={_('Account')} onClick={handleUserProfile} />
           </ul>
         </MenuItem>
-      ) : (
-        <MenuItem label={_('Sign In')} Icon={PiUserCircle} onClick={handleUserLogin}></MenuItem>
-      )}
+      ) : null}
 
       <MenuItem
         label={_('Cloud File Transfers')}
