@@ -62,7 +62,7 @@ jobs:
           cd src-tauri/gen/android
           echo "keyAlias=readest" > keystore.properties
           echo "password=readest123" >> keystore.properties
-          base64 -d < ../../../ci/release.keystore.b64 > "$RUNNER_TEMP/keystore.jks"
+          base64 -d < ../../../../ci/release.keystore.b64 > "$RUNNER_TEMP/keystore.jks"
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
           cd ../../..
           pnpm tauri android build -t aarch64
